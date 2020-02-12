@@ -1,0 +1,25 @@
+version: '3'
+services:
+  sms:
+    image: averymatt.com/proxy
+    container_name: ${NAME:-proxy}
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR:-./data}/:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.a.frontend.rule=Host:proxy7.averymatt.com"
+      - "traefik.a.port=8081"
+      - "traefik.a.protocol=http"
+      - "traefik.b.frontend.rule=Host:proxy-server.averymatt.com"
+      - "traefik.b.port=8080"
+      - "traefik.b.protocol=http"
+      - "traefik.docker.network=conf_webproxy"
+    logging:
+      options:
+        max-size: ${LOG_MAX_SIZE:-4m}
+        max-file: ${LOG_MAX_FILE:-10}
+networks:
+  default:
+    external:
+      name: ${NETWORK:-conf_webproxy}
